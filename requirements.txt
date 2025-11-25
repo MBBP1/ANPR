@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+SQLAlchemy>=1.4
+pymysql
+python-dotenv
+pydantic
+python-multipart
+python-magic   # valgfrit til filtypecheck
