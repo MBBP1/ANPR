@@ -1,0 +1,20 @@
+mqtt:
+  broker: "localhost"  # Eller IP-adressen på PC'en
+  port: 1883
+  client_id: "raspberry_pi"
+  topics: # Den lytter på de 2 emner kan you fat that
+    available_spots: "parking/available_spots"
+    gate_control: "parking/gate_control"
+
+display:
+  type: "oled"
+  width: 128
+  height: 64
+
+gate:
+  open_time: 3  # sekunder bom er åben
+
+servo:
+  pin: 18        # GPIO pin for servo
+  open_angle: 90 # Vinkel når bom er åben (grader)
+  close_angle: 0 # Vinkel når bom er lukket (grader)

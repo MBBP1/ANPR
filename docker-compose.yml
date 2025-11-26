@@ -1,16 +1,39 @@
-version: "3.8"
+
 services:
+  # MariaDB database
   mariadb:
-    image: mariadb:10.11
+    image: mariadb:latest
+    container_name: parking_db
     restart: unless-stopped
+    env_file: .env
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: parking_db
-      MYSQL_USER: park_user
-      MYSQL_PASSWORD: park_password
-    volumes:
-      - mariadb_data:/var/lib/mysql
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./shared/sql/init_database.sql:/docker-entrypoint-initdb.d/init_database.sql
+    networks:
+      - parking_network
+
+  # MQTT Broker - NO TLS
+  mqtt-broker:
+    image: eclipse-mosquitto:latest
+    container_name: parking_mqtt_broker
+    restart: unless-stopped
+    ports:
+      - "1883:1883"  # Standard MQTT port
+    volumes:
+      - ./mqtt-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - parking_network
+
 volumes:
-  mariadb_data:
+  db_data:
+
+networks:
+  parking_network:
+    driver: bridge

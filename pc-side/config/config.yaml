@@ -1,0 +1,23 @@
+camera:
+  source: 0
+  width: 640
+  height: 480
+
+database:
+  host: "localhost"
+  port: 3306
+  user: "parking_user"
+  password: "parking_password123"
+  database: "parking_system"
+
+mqtt:
+  broker: "localhost"
+  port: 1883
+  client_id: "pc_camera"
+  topics:
+    parking_events: "parking/events"
+    available_spots: "parking/available_spots"
+
+license_plate:
+  cascade_file: "config/cascade.xml"
+  confidence_threshold: 0.8

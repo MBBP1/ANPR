@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  mariadb:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: parking_db
+      MYSQL_USER: park_user
+      MYSQL_PASSWORD: park_password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+volumes:
+  mariadb_data:
