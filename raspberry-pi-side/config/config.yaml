@@ -1,10 +1,16 @@
+#raspberry-pi-side\config\config.yaml
+
 mqtt:
   broker: "localhost"  # Eller IP-adressen på PC'en
-  port: 1883
+  port: 8883
   client_id: "raspberry_pi"
   topics: # Den lytter på de 2 emner kan you fat that
     available_spots: "parking/available_spots"
     gate_control: "parking/gate_control"
+  tls:  # Tilføj TLS sektion
+    ca_cert: "config/ssl/ca.crt"
+    client_cert: "config/ssl/client.crt" 
+    client_key: "config/ssl/client.key"
 
 display:
   type: "oled"

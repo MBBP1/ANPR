@@ -46,3 +46,12 @@ class DisplayManager:
     def cleanup(self):
         """Ryd op ved afslutning"""
         self.oled_clear()
+
+
+
+
+
+
+
+
+

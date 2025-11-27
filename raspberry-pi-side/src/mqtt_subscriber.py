@@ -1,6 +1,10 @@
+#raspberry-pi-side\src\mqtt_subscriber.py
+
 import paho.mqtt.client as mqtt
 import json
 import time
+import ssl
+import os
 from display_manager import DisplayManager
 from gate_controller import GateController
 
@@ -15,27 +19,63 @@ class MQTTSubscriber:
         
         # MQTT client
         self.client = mqtt.Client(client_id="raspberry_pi")
+        self.setup_tls(config)
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         
-        self.connect()
+        self.connect(config)
 
-    def connect(self):
-        """Forbind til MQTT broker"""
+    def setup_tls(self, config):
+        """Opsæt TLS for MQTT forbindelse"""
         try:
-            self.client.connect("10.0.0.104", 1883, 60)
-            self.client.loop_start()
-            print(" Forbundet til MQTT broker")
+            mqtt_config = config['mqtt']
+            
+            # Hent TLS konfiguration
+            tls_config = mqtt_config.get('tls', {})
+            ca_cert = tls_config.get('ca_cert', 'config/ssl/ca.crt')
+            client_cert = tls_config.get('client_cert')
+            client_key = tls_config.get('client_key')
+            
+            # Opsæt TLS
+            self.client.tls_set(
+                ca_certs=ca_cert,
+                certfile=client_cert if client_cert and os.path.exists(client_cert) else None,
+                keyfile=client_key if client_key and os.path.exists(client_key) else None,
+                cert_reqs=ssl.CERT_REQUIRED,
+                tls_version=ssl.PROTOCOL_TLSv1_2
+            )
+            
+            # Slå hostname verification fra
+            self.client.tls_insecure_set(True)
+            
+            print(" TLS konfigureret for MQTT Subscriber")
+            
         except Exception as e:
-            print(f" MQTT fejl: {e}")
+            print(f" Fejl ved TLS opsætning: {e}")
+
+    def connect(self, config):
+        """Forbind til MQTT broker med TLS"""
+        try:
+            mqtt_config = config['mqtt']
+            self.client.connect(
+                mqtt_config['broker'],
+                int(mqtt_config['port']),
+                60
+            )
+            self.client.loop_start()
+            print(" Forbundet til MQTT broker med TLS")
+        except Exception as e:
+            print(f" MQTT TLS forbindelsesfejl: {e}")
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
-            print(" MQTT forbundet")
+            print(" MQTT TLS forbundet succesfuldt")
             client.subscribe("parking/available_spots")
             client.subscribe("parking/events")
             # Vis 0 pladser som start
             self.display.update_parking_display(0)
+        else:
+            print(f" MQTT forbindelsesfejl: {rc}")
 
     def on_message(self, client, userdata, msg):
         if msg.topic == "parking/available_spots":
@@ -67,6 +107,15 @@ class MQTTSubscriber:
 
 if __name__ == "__main__":
     config = {
+        'mqtt': {
+            'broker': "10.0.0.104",
+            'port': 8883,
+            'tls': {
+                'ca_cert': 'config/ssl/ca.crt',
+                'client_cert': 'config/ssl/client.crt',
+                'client_key': 'config/ssl/client.key'
+            }
+        },
         'servo': {'pin': 18, 'open_angle': 90, 'close_angle': 0},
         'gate': {'open_time': 3}
     }
