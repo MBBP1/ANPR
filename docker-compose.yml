@@ -25,11 +25,16 @@ services:
     container_name: parking_mqtt_broker
     restart: unless-stopped
     ports:
-      - "1883:1883"  # Standard MQTT port
+      - "8883:8883" #MQTTS  - # Standard MQTT port # 1883
     volumes:
       - ./mqtt-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mqtt-broker/passwordfile:/mosquitto/config/passwordfile
+      - ./shared/ssl/ca:/mosquitto/ssl/ca
+      - ./shared/ssl/broker:/mosquitto/ssl/broker
     networks:
       - parking_network
+
+
 
 volumes:
   db_data:
