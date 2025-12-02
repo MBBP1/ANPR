@@ -2,6 +2,10 @@ import sys
 import os
 import pytest
 from unittest.mock import Mock
+from unittest.mock import MagicMock
+
+sys.modules['mysql'] = MagicMock()
+sys.modules['mysql.connector'] = MagicMock()
 
 # Tilføj pc-side/src til Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'pc-side', 'src')))
@@ -47,3 +51,23 @@ def test_update_parking_spots(db_handler):
     assert db_handler.connection.cursor().execute.call_count > 0
     db_handler.connection.commit.assert_called_once()
     db_handler.connection.cursor().close.assert_called_once()
+
+def test_insert_license_plate_db_error(db_handler):
+    # Simulerer exception i execute
+    db_handler.connection.cursor().execute.side_effect = Exception("DB fejl")
+    try:
+        db_handler.insert_license_plate("ABC123")
+        success = True
+    except Exception:
+        success = False
+    assert success  # testen skal IKKE kaste exception
+
+def test_multiple_inserts(db_handler):
+    plates = ["AAA111", "BBB222", "CCC333"]
+    for plate in plates:
+        db_handler.insert_license_plate(plate)
+
+    cursor = db_handler.connection.cursor()
+    assert cursor.execute.call_count == len(plates)
+    assert db_handler.connection.commit.call_count == len(plates)
+    assert cursor.close.call_count == len(plates)

@@ -1,7 +1,8 @@
 import sys
 import os
+from time import time
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 import json
 from datetime import datetime
 
@@ -58,3 +59,5 @@ def test_parking_event(mqtt_config, mock_mqtt_client):
     assert message['plate_number'] == "ABC123"
     assert message['event_type'] == "entry"
     assert 'timestamp' in message
+
+
