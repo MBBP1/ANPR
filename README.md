@@ -218,3 +218,15 @@ $ docker compose down
  ✔ Container parking_mqtt_broker  Removed                           0.4s 
  ✔ Container parking_db           Removed                           0.5s 
  ✔ Network anpr_parking_network   Removed  
+
+
+
+
+Vis MariaDB 
+docker exec -it parking_db mariadb -u root -p
+
+kig i .env
+
+SHOW DATABASES;
+
+
