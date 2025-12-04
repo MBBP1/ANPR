@@ -1,8 +1,8 @@
-
+# pc-side/src/main.py
 #Midlertidig simulator for nummerpladegenkendelse og parkeringshændelser
 
 
-import time
+import time 
 import random
 import yaml  # Tilføj denne import
 from database_handler import DatabaseHandler

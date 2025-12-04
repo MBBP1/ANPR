@@ -19,6 +19,10 @@ anpr/
 │   ├── config/
 │   │   ├── config.yaml           # Konfiguration (kamera, DB, MQTT)
 │   │   └── cascade.xml           # Haar Cascade til OpenCV
+|   |   └── ssl 
+|   |       └──ca.crt
+|   |       └──client.crt
+|   |       └──client.key
 │   ├── requirements.txt          # Python afhængigheder
 │   └── Dockerfile                # Containerisering (valgfri)
 │
@@ -30,11 +34,35 @@ anpr/
 │   │   └── gate_controller.py    # Servo motor kontrol til bom
 │   ├── config/
 │   │   └── config.yaml           # Konfiguration (MQTT, GPIO, display)
+|   |   └── ssl 
+|   |       └──ca.crt
+|   |       └──rasp.crt
+|   |       └──rasp.key
 │   ├── requirements.txt          # Python afhængigheder
 │   └── start.sh                  # Startup script
 │
 └── 🔗 shared/
-    ├── ssl/                      # TLS certifikater (ikke i brug lige nu)
+    ├── ssl/
+    |   ├──broker
+    |   |  └──broker.crt
+    |   |  └──broker.csr
+    |   |  └──broker.key
+    ├── ssl/
+    |   ├──ca
+    |   |  └──ca.crt
+    |   |  └──ca.srl
+    |   |  └──ca.key
+    ├── ssl/
+    |   ├──client
+    |   |  └──kamera
+    |   |     └──client.crt
+    |   |     └──client.csr
+    |   |     └──client.key
+    |   |  └──rasp
+    |   |     └──rasp.crt
+    |   |     └──rasp.csr
+    |   |     └──rasp.key
+
     └── sql/
         └── init_database.sql     # Database schema opsætning
 ```

@@ -6,7 +6,9 @@ import time
 import ssl
 import os
 from display_manager import DisplayManager
-from gate_controller import GateController
+#from gate_controller import GateController
+
+
 
 class MQTTSubscriber:
     def __init__(self, config):
@@ -15,7 +17,7 @@ class MQTTSubscriber:
         
         # Initialize display og gate controller
         self.display = DisplayManager(config)
-        self.gate_controller = GateController(config)
+        #self.gate_controller = GateController(config)
         
         # MQTT client
         self.client = mqtt.Client(client_id="raspberry_pi")
@@ -88,7 +90,7 @@ class MQTTSubscriber:
             # Tjek om nogen er kørt UD (flere ledige pladser)
             if new_available_spots > self.available_spots:
                 print(" Bil kørte UD - åbner bom!")
-                self.gate_controller.open_gate()
+                #self.gate_controller.open_gate()
             
             self.available_spots = new_available_spots
             
@@ -101,14 +103,14 @@ class MQTTSubscriber:
     def cleanup(self):
         """Ryd op ved afslutning"""
         self.display.cleanup()
-        self.gate_controller.cleanup()
+        #self.gate_controller.cleanup()
         self.client.loop_stop()
         self.client.disconnect()
 
 if __name__ == "__main__":
     config = {
         'mqtt': {
-            'broker': "10.0.0.104",
+            'broker': "192.168.1.22",
             'port': 8883,
             'tls': {
                 'ca_cert': 'config/ssl/ca.crt',
