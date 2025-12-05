@@ -1,23 +1,19 @@
-#raspberry-pi-side\src\mqtt_subscriber.py
-
+# raspberry-pi-side/src/mqtt_subscriber.py
 import paho.mqtt.client as mqtt
 import json
 import time
 import ssl
 import os
 from display_manager import DisplayManager
-#from gate_controller import GateController
-
-
+from gate_controller import GateController  # IMPORT GATE CONTROLLER!
 
 class MQTTSubscriber:
     def __init__(self, config):
         self.available_spots = 0
-        self.last_available_spots = 0
         
         # Initialize display og gate controller
         self.display = DisplayManager(config)
-        #self.gate_controller = GateController(config)
+        self.gate_controller = GateController(config)  # VIGTIGT!
         
         # MQTT client
         self.client = mqtt.Client(client_id="raspberry_pi")
@@ -72,59 +68,65 @@ class MQTTSubscriber:
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
             print(" MQTT TLS forbundet succesfuldt")
+            # Subscribe til ALLE relevante topics
             client.subscribe("parking/available_spots")
             client.subscribe("parking/events")
+            client.subscribe("parking/gate_control")  # VIGTIGT FOR BOM KONTROL!
+            
             # Vis 0 pladser som start
             self.display.update_parking_display(0)
+            
+            print(" Abonnerer på:")
+            print("  - parking/available_spots")
+            print("  - parking/events")
+            print("  - parking/gate_control")
         else:
             print(f" MQTT forbindelsesfejl: {rc}")
 
     def on_message(self, client, userdata, msg):
-        if msg.topic == "parking/available_spots":
-            payload = json.loads(msg.payload.decode())
-            new_available_spots = payload['available_spots']
+        try:
+            print(f"\n📨 Modtaget på {msg.topic}")
             
-            print(f"Ledige pladser: {new_available_spots}")
-            self.display.update_parking_display(new_available_spots)
-            
-            # Tjek om nogen er kørt UD (flere ledige pladser)
-            if new_available_spots > self.available_spots:
-                print(" Bil kørte UD - åbner bom!")
-                #self.gate_controller.open_gate()
-            
-            self.available_spots = new_available_spots
-            
-        elif msg.topic == "parking/events":
-            payload = json.loads(msg.payload.decode())
-            plate = payload['plate_number']
-            event = payload['event_type']
-            print(f"BEGIVENHED: Bil {plate} - {event}")
+            if msg.topic == "parking/available_spots":
+                payload = json.loads(msg.payload.decode())
+                new_available_spots = payload['available_spots']
+                
+                print(f" Ledige pladser: {new_available_spots}")
+                self.display.update_parking_display(new_available_spots)
+                
+                self.available_spots = new_available_spots
+                
+            elif msg.topic == "parking/events":
+                payload = json.loads(msg.payload.decode())
+                plate = payload['plate_number']
+                event = payload['event_type']
+                print(f" BEGIVENHED: Bil {plate} - {event}")
+                
+            elif msg.topic == "parking/gate_control":  # VIGTIGT!
+                payload = json.loads(msg.payload.decode())
+                command = payload['command']
+                plate = payload.get('plate_number', '')
+                
+                print(f" GATE KOMMANDO: {command} for {plate}")
+                
+                if command == "open":
+                    print(f"   → Åbner bom for bil {plate}")
+                    self.gate_controller.open_gate()
+                elif command == "close":
+                    print(f"   → Lukker bom")
+                    self.gate_controller.close_gate()
+                elif command == "test":
+                    print(f"   → Test bom")
+                    self.gate_controller.open_gate()
+                    
+        except Exception as e:
+            print(f" Fejl ved håndtering af MQTT besked: {e}")
 
     def cleanup(self):
         """Ryd op ved afslutning"""
+        print(" Rydder op...")
         self.display.cleanup()
-        #self.gate_controller.cleanup()
+        self.gate_controller.cleanup()  # VIGTIGT!
         self.client.loop_stop()
         self.client.disconnect()
-
-if __name__ == "__main__":
-    config = {
-        'mqtt': {
-            'broker': "192.168.1.22",
-            'port': 8883,
-            'tls': {
-                'ca_cert': 'config/ssl/ca.crt',
-                'client_cert': 'config/ssl/client.crt',
-                'client_key': 'config/ssl/client.key'
-            }
-        },
-        'servo': {'pin': 18, 'open_angle': 90, 'close_angle': 0},
-        'gate': {'open_time': 3}
-    }
-    subscriber = MQTTSubscriber(config)
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print(" Stopper...")
-        subscriber.cleanup()
+        print(" Alt ryddet op")

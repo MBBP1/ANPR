@@ -47,12 +47,8 @@ def main():
     mqtt_publisher = MQTTPublisher(config)
     plate_recognizer = LicensePlateRecognizer(config)
     
-    # Start med 50 ledige pladser
-    available_spots = 50
-    print(f"  Start ledige pladser: {available_spots}")
-    
     # Send initial status til MQTT
-    mqtt_publisher.publish_available_spots(available_spots)
+    mqtt_publisher.publish_available_spots(plate_recognizer.available_spots)
     
     print("\n" + "=" * 50)
     print(" SYSTEM KLAR")
@@ -64,16 +60,18 @@ def main():
     
     try:
         # Start realtids nummerpladegenkendelse
-        available_spots = plate_recognizer.run_real_time(
+        # KUN to parametre - ikke available_spots!
+        plate_recognizer.run_real_time(
             db_handler=db_handler,
-            mqtt_publisher=mqtt_publisher,
-            available_spots=available_spots
+            mqtt_publisher=mqtt_publisher
         )
         
     except KeyboardInterrupt:
         print("\n\n System stoppet af bruger")
     except Exception as e:
         print(f"\n\n Ukendt fejl: {e}")
+        import traceback
+        traceback.print_exc()
     finally:
         # Cleanup
         print("\nRydder op...")
