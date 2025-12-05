@@ -1,84 +1,85 @@
 # pc-side/src/main.py
-#Midlertidig simulator for nummerpladegenkendelse og parkeringshændelser
-
-
-import time 
-import random
-import yaml  # Tilføj denne import
+import yaml
+import sys
+import os
 from database_handler import DatabaseHandler
 from mqtt_publisher import MQTTPublisher
-
-class LicensePlateSimulator:
-    def __init__(self):
-        self.plates = ["AB12345", "CD67890", "EF24680", "GH13579", "IJ11223"]
-        self.available_spots = 50
-        self.total_spots = 200
-    
-    def simulate_plate_detection(self):
-        """Simulerer at en nummerplade bliver genkendt"""
-        plate = random.choice(self.plates)
-        print(f" Nummerplade genkendt: {plate}")
-        
-        # Simuler indkørsel (75% chance) eller udkørsel (25% chance)
-        if random.random() < 0.75 and self.available_spots > 0:
-            event_type = "entry"
-            self.available_spots -= 1
-            print(f"  -> Bil kører ind. Ledige pladser: {self.available_spots}")
-        else:
-            event_type = "exit" 
-            self.available_spots = min(self.available_spots + 1, self.total_spots)
-            print(f"  -> Bil kører ud. Ledige pladser: {self.available_spots}")
-        
-        return plate, event_type
+from license_plate_recognizer import LicensePlateRecognizer
 
 def load_config():
     """Indlæs YAML konfiguration"""
     try:
-        with open('config/config.yaml', 'r') as file:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(current_dir, '..', 'config', 'config.yaml')
+        config_path = os.path.abspath(config_path)
+        
+        print(f" Leder efter config: {config_path}")
+        
+        with open(config_path, 'r', encoding='utf-8') as file:
             config = yaml.safe_load(file)
+        
+        print(" Konfiguration indlæst")
         return config
     except Exception as e:
         print(f" Fejl ved indlæsning af config: {e}")
         return {}
 
 def main():
+    print("=" * 50)
+    print(" PARKINGSYSTEM - NUMMERPLADEGENKENDELSE")
+    print("=" * 50)
+    
     # Load configuration
     config = load_config()
     
     if not config:
         print(" Kunne ikke indlæse konfiguration")
-        return
+        sys.exit(1)
+    
+    print(f"\nSystem konfiguration:")
+    print(f"  Database: {config['database']['host']}:{config['database']['port']}")
+    print(f"  MQTT Broker: {config['mqtt']['broker']}:{config['mqtt']['port']}")
+    print(f"  Kamera: Source {config['camera']['source']}")
     
     # Initialize components
+    print("\nInitialiserer komponenter...")
     db_handler = DatabaseHandler(config)
     mqtt_publisher = MQTTPublisher(config)
-    simulator = LicensePlateSimulator()
+    plate_recognizer = LicensePlateRecognizer(config)
     
-    print(" Parkeringssystem simulator startet...")
-    print(" Sendere data til MQTT og database")
-    print(" Database: localhost:3306")
-    print(" MQTT: localhost:1883")
-    print("  Tryk Ctrl+C for at stoppe\n")
+    # Start med 50 ledige pladser
+    available_spots = 50
+    print(f"  Start ledige pladser: {available_spots}")
+    
+    # Send initial status til MQTT
+    mqtt_publisher.publish_available_spots(available_spots)
+    
+    print("\n" + "=" * 50)
+    print(" SYSTEM KLAR")
+    print("  - Genkender nummerplader med kamera")
+    print("  - Gemmer plader i database")
+    print("  - Sender til MQTT broker")
+    print("\nTryk Q i kamera-vinduet for at stoppe")
+    print("=" * 50 + "\n")
     
     try:
-        while True:
-            # Simuler nummerpladegenkendelse
-            plate, event_type = simulator.simulate_plate_detection()
-            
-            # Gem i database
-            db_handler.insert_license_plate(plate)
-            db_handler.insert_parking_event(plate, event_type)
-            db_handler.update_parking_spots(simulator.available_spots)
-            
-            # Send til MQTT
-            mqtt_publisher.publish_available_spots(simulator.available_spots)
-            mqtt_publisher.parking_event(plate, event_type)
-            
-            # Vent 3-8 sekunder før næste "genkendelse"
-            time.sleep(random.uniform(3, 8))
-            
+        # Start realtids nummerpladegenkendelse
+        available_spots = plate_recognizer.run_real_time(
+            db_handler=db_handler,
+            mqtt_publisher=mqtt_publisher,
+            available_spots=available_spots
+        )
+        
     except KeyboardInterrupt:
-        print("\n Simulator stoppet")
+        print("\n\n System stoppet af bruger")
+    except Exception as e:
+        print(f"\n\n Ukendt fejl: {e}")
+    finally:
+        # Cleanup
+        print("\nRydder op...")
+        mqtt_publisher.disconnect()
+        db_handler.close()
+        print("System afsluttet")
 
 if __name__ == "__main__":
     main()
