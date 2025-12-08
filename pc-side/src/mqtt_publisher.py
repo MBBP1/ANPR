@@ -9,7 +9,7 @@ class MQTTPublisher:
     def __init__(self, config):
         self.config = config
         self.client = mqtt.Client(client_id=config['mqtt']['client_id'])
-        self.connected = False  # TILFØJ DENNE LINJE!
+        self.connected = False
         self.setup_tls()
         self.connect()
     
@@ -124,4 +124,4 @@ class MQTTPublisher:
         """Afslut forbindelse korrekt"""
         self.client.loop_stop()
         self.client.disconnect()
-        self.connected = False  # TILFØJ DENNE LINJE!
+        self.connected = False

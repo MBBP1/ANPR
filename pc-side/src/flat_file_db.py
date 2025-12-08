@@ -14,13 +14,13 @@ class FlatFileDB:
             if os.path.exists(self.db_file):
                 with open(self.db_file, 'r') as f:
                     data = json.load(f)
-                    print(f" 📂 Indlæst {len(data)} parkerede biler fra {self.db_file}")
+                    print(f"Indlæst {len(data)} parkerede biler fra {self.db_file}")
                     return data
             else:
-                print(f" 📂 Ingen eksisterende database - starter med tom liste")
+                print(f"Ingen eksisterende database - starter med tom liste")
                 return []
         except Exception as e:
-            print(f" ❌ Fejl ved indlæsning af data: {e}")
+            print(f"Fejl ved indlæsning af data: {e}")
             return []
     
     def save_data(self):
@@ -29,18 +29,18 @@ class FlatFileDB:
             with open(self.db_file, 'w') as f:
                 json.dump(self.parked_cars, f, indent=2)
         except Exception as e:
-            print(f" ❌ Fejl ved gemning af data: {e}")
+            print(f"Fejl ved gemning af data: {e}")
     
     def car_entry(self, plate_number):
         """Registrer indkørsel - tilføj bil til database"""
         if plate_number in self.parked_cars:
-            print(f"   ⚠️  Bil {plate_number} er allerede registreret")
+            print(f"Bil {plate_number} er allerede registreret")
             return False
         
         self.parked_cars.append(plate_number)
         self.save_data()
-        print(f"   📥 Bil {plate_number} tilføjet til database")
-        print(f"      Antal parkerede biler: {len(self.parked_cars)}")
+        print(f"Bil {plate_number} tilføjet til database")
+        print(f"Antal parkerede biler: {len(self.parked_cars)}")
         return True
     
     def car_exit(self, plate_number):
@@ -48,11 +48,11 @@ class FlatFileDB:
         if plate_number in self.parked_cars:
             self.parked_cars.remove(plate_number)
             self.save_data()
-            print(f"   📤 Bil {plate_number} fjernet fra database")
-            print(f"      Antal parkerede biler: {len(self.parked_cars)}")
+            print(f"Bil {plate_number} fjernet fra database")
+            print(f"Antal parkerede biler: {len(self.parked_cars)}")
             return True
         else:
-            print(f"   ⚠️  Bil {plate_number} findes ikke i database")
+            print(f"Bil {plate_number} findes ikke i database")
             return False
     
     def is_car_parked(self, plate_number):
@@ -71,4 +71,4 @@ class FlatFileDB:
         """Ryd alle data (til debugging)"""
         self.parked_cars = []
         self.save_data()
-        print("   ♻️  Alle data ryddet")
+        print("Alle data ryddet")

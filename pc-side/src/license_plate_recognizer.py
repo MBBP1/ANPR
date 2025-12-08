@@ -4,7 +4,7 @@ import easyocr
 import re
 import time
 import numpy as np
-from flat_file_db import FlatFileDB  # NY IMPORT!
+from flat_file_db import FlatFileDB
 
 class LicensePlateRecognizer:
     def __init__(self, config):
@@ -124,10 +124,10 @@ class LicensePlateRecognizer:
             mqtt_publisher.publish_available_spots(self.available_spots)
             mqtt_publisher.parking_event(plate, "entry")
             
-            print(f"      ✅ Accepteret - Ledige pladser: {self.available_spots}")
+            print(f"Accepteret - Ledige pladser: {self.available_spots}")
             return True
         else:
-            print(f"   ⛔ INGEN PLADS: Bil {plate} afvist")
+            print(f"INGEN PLADS: Bil {plate} afvist")
             mqtt_publisher.parking_event(plate, "denied")
             return False
 
@@ -144,7 +144,7 @@ class LicensePlateRecognizer:
         
         # 1. Tjek om bilen er i flat file DB
         if self.db.is_car_parked(plate):
-            print(f"      ✅ Bil {plate} er registreret - åbner bom")
+            print(f"Bil {plate} er registreret - åbner bom")
             
             # 2. Gem i MariaDB (historik)
             db_handler.insert_license_plate(plate)
@@ -162,10 +162,10 @@ class LicensePlateRecognizer:
             mqtt_publisher.publish_available_spots(self.available_spots)
             mqtt_publisher.parking_event(plate, "exit")
             
-            print(f"      🚗 Bom åbnes - Ledige pladser: {self.available_spots}")
+            print(f"Bom åbnes - Ledige pladser: {self.available_spots}")
             return True
         else:
-            print(f"      ⚠️  Bil {plate} IKKE registreret - ingen handling")
+            print(f"Bil {plate} IKKE registreret - ingen handling")
             return False
     
     def run_real_time(self, db_handler, mqtt_publisher):
@@ -241,7 +241,7 @@ class LicensePlateRecognizer:
                 if confirm.lower() == 'ja':
                     self.db.clear_all()
                     self.available_spots = 50
-                    print("   ✅ Alle data ryddet og pladser nulstillet")
+                    print("Alle data ryddet og pladser nulstillet")
         
         cap.release()
         cv2.destroyAllWindows()
