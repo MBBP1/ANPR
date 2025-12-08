@@ -1,10 +1,6 @@
-shared/ssl/**/*.key
-shared/ssl/**/*.csr
-shared/ssl/**/*.srl
-shared/ssl/ca/ca.key
-shared/ssl/broker/broker.key
-shared/ssl/broker/broker.csr
-shared/ssl/client/client.key
-shared/ssl/client/client.csr
 
+shared\ssl\*
 
+pc-side\config\ssl\*
+
+raspberry-pi-side\config\ssl\*

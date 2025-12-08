@@ -9,8 +9,8 @@ mqtt:
     gate_control: "parking/gate_control"
   tls:  # Tilføj TLS sektion
     ca_cert: "config/ssl/ca.crt"
-    client_cert: "config/ssl/client.crt" 
-    client_key: "config/ssl/client.key"
+    client_cert: "config/ssl/rasp.crt" 
+    client_key: "config/ssl/rasp.key"
 
 display:
   type: "oled"

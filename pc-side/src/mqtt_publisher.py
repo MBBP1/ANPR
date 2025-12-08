@@ -1,3 +1,4 @@
+# pc-side/src/mqtt_publisher.py
 import paho.mqtt.client as mqtt
 import json
 from datetime import datetime
@@ -8,6 +9,7 @@ class MQTTPublisher:
     def __init__(self, config):
         self.config = config
         self.client = mqtt.Client(client_id=config['mqtt']['client_id'])
+        self.connected = False  # TILFØJ DENNE LINJE!
         self.setup_tls()
         self.connect()
     
@@ -47,9 +49,11 @@ class MQTTPublisher:
                 int(self.config['mqtt']['port'])
             )
             self.client.loop_start()
+            self.connected = True  # TILFØJ DENNE LINJE!
             print(" Forbundet til MQTT broker med TLS")
         except Exception as e:
             print(f" MQTT TLS forbindelsesfejl: {e}")
+            self.connected = False
     
     def publish_available_spots(self, available_spots):
         """Publicer antal ledige pladser"""
@@ -89,7 +93,35 @@ class MQTTPublisher:
         except Exception as e:
             print(f"   MQTT publish fejl (event): {e}")
 
+    def publish_gate_command(self, command, plate_number=""):
+        """Send direkte kommando til gate controller"""
+        # FJERN check på self.connected eller fix det:
+        try:
+            message = {
+                "command": command,
+                "plate_number": plate_number,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            result = self.client.publish(
+                "parking/gate_control",
+                json.dumps(message),
+                qos=1
+            )
+            
+            if result.rc == mqtt.MQTT_ERR_SUCCESS:
+                print(f"   MQTT: Gate command '{command}' for {plate_number}")
+                return True
+            else:
+                print(f"   MQTT: Kunne ikke sende gate command")
+                return False
+                
+        except Exception as e:
+            print(f"   MQTT fejl (gate): {e}")
+            return False
+
     def disconnect(self):
         """Afslut forbindelse korrekt"""
         self.client.loop_stop()
         self.client.disconnect()
+        self.connected = False  # TILFØJ DENNE LINJE!

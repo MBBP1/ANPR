@@ -1,3 +1,4 @@
+# Docker Compose configuration for MariaDB and MQTT Broker
 
 services:
   # MariaDB database
@@ -19,7 +20,7 @@ services:
     networks:
       - parking_network
 
-  # MQTT Broker - NO TLS
+  # MQTT Broker 
   mqtt-broker:
     image: eclipse-mosquitto:latest
     container_name: parking_mqtt_broker
