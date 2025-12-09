@@ -2,15 +2,15 @@
  MQTT og mariaDB kører som 0services  
 ```txt
 anpr/
-├── 🐳 docker-compose.yml          # Docker services (MariaDB + MQTT)
-├── 🔐 .env                        # Miljøvariabler (passwords)
-├── 📖 README.md                   # Projekt dokumentation
+├── docker-compose.yml          # Docker services (MariaDB + MQTT)
+├── .env                        # Miljøvariabler (passwords)
+├── README.md                   # Projekt dokumentation
 │
-├── 📡 mqtt-broker/
+├── mqtt-broker/
 │   ├── mosquitto.conf            # MQTT broker konfiguration
 │   └── passwordfile              # MQTT bruger passwords
 │
-├── 💻 pc-side/                    # Bærbar PC med kamera
+├── pc-side/                    # Bærbar PC med kamera
 │   ├── src/
 │   │   ├── main.py               # Hovedprogram - koordinerer alt
 │   │   ├── license_plate_recognizer.py  # ML nummerpladegenkendelse test udgave lige nuuu
@@ -26,7 +26,7 @@ anpr/
 │   ├── requirements.txt          # Python afhængigheder
 │   └── Dockerfile                # Containerisering (valgfri)
 │
-├── 🍓 raspberry-pi-side/         # Raspberry Pi ved parkeringspladsen
+├── raspberry-pi-side/         # Raspberry Pi ved parkeringspladsen
 │   ├── src/
 │   │   ├── main.py               # Hovedprogram - starter MQTT subscriber
 │   │   ├── mqtt_subscriber.py    # MQTT subscribing fra PC
@@ -41,7 +41,7 @@ anpr/
 │   ├── requirements.txt          # Python afhængigheder
 │   └── start.sh                  # Startup script
 │
-└── 🔗 shared/
+└── shared/
     ├── ssl/
     |   ├──broker
     |   |  └──broker.crt
