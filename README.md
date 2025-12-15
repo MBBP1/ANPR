@@ -13,9 +13,9 @@ anpr/
 ├── pc-side/                      # Bærbar PC med kamera
 │   ├── src/
 │   │   ├── main.py               # Hovedprogram - koordinerer alt
-│   │   ├── license_plate_recognizer.py  # ML nummerpladegenkendelse test udgave lige nuuu
+│   │   ├── license_plate_recognizer.py  # ML nummerpladegenkendelse
 │   │   ├── database_handler.py   # MariaDB kommunikation
-│   │   ├── flatfiledb.py   # MariaDB kommunikation
+│   │   ├── flatfiledb.py         # json db
 │   │   └── mqtt_publisher.py     # MQTT publishing til Raspberry Pi
 │   ├── config/
 │   │   ├── config.yaml           # Konfiguration (kamera, DB, MQTT)
