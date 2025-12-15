@@ -10,15 +10,16 @@ anpr/
 │   ├── mosquitto.conf            # MQTT broker konfiguration
 │   └── passwordfile              # MQTT bruger passwords
 │
-├── pc-side/                    # Bærbar PC med kamera
+├── pc-side/                      # Bærbar PC med kamera
 │   ├── src/
 │   │   ├── main.py               # Hovedprogram - koordinerer alt
 │   │   ├── license_plate_recognizer.py  # ML nummerpladegenkendelse test udgave lige nuuu
 │   │   ├── database_handler.py   # MariaDB kommunikation
+│   │   ├── flatfiledb.py   # MariaDB kommunikation
 │   │   └── mqtt_publisher.py     # MQTT publishing til Raspberry Pi
 │   ├── config/
 │   │   ├── config.yaml           # Konfiguration (kamera, DB, MQTT)
-│   │   └── cascade.xml           # Haar Cascade til OpenCV
+│   │   └──
 |   |   └── ssl 
 |   |       └──ca.crt
 |   |       └──client.crt
