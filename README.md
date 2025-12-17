@@ -1,5 +1,3 @@
- Det her er nuværende status på projektet det kører unde TLS men kommunikation mellem raspberry og broker virker fint. Jeg har lavet en nummerplade simulator så vi kan implementere vores egen rigtige anpg kode. Alle nummerplader bliver også indsat i databasen samt tidspunkt
- MQTT og mariaDB kører som 0services  
 ```txt
 anpr/
 ├── docker-compose.yml          # Docker services (MariaDB + MQTT)
