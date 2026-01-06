@@ -19,9 +19,9 @@ anpr/
 │   │   ├── config.yaml           # Konfiguration (kamera, DB, MQTT)
 │   │   └──
 |   |   └── ssl 
-|   |       └──ca.crt
-|   |       └──client.crt
-|   |       └──client.key
+|   |       └──ca.crt             # Bruges til at validere broker
+|   |       └──client.crt         # clienten's eget certifikat
+|   |       └──client.key         # Clienten's private nøgle
 │   ├── requirements.txt          # Python afhængigheder
 │   └── Dockerfile                # Containerisering (valgfri)
 │
@@ -34,29 +34,29 @@ anpr/
 │   ├── config/
 │   │   └── config.yaml           # Konfiguration (MQTT, GPIO, display)
 |   |   └── ssl 
-|   |       └──ca.crt
-|   |       └──rasp.crt
-|   |       └──rasp.key
+|   |       └──ca.crt             # Bruges til at validere broker
+|   |       └──rasp.crt           # Raspberry's eget certifikat
+|   |       └──rasp.key           # Raspberry's private nøgle
 │   ├── requirements.txt          # Python afhængigheder
 │   
 │
 └── shared/
     ├── ssl/
     |   ├──broker
-    |   |  └──broker.crt
-    |   |  └──broker.csr
-    |   |  └──broker.key
+    |   |  └──broker.crt # Server-certifikat - Identificerer brokeren for klienter
+    |   |  └──broker.csr # Certificate Signing Request - Brugt til at få cert underskrevet af CA
+    |   |  └──broker.key # Privat server-nøgle - Til TLS-autentifikation
     ├── ssl/
     |   ├──ca
-    |   |  └──ca.crt
-    |   |  └──ca.srl
-    |   |  └──ca.key
+    |   |  └──ca.crt  # Offentligt certifikat - Distribueres til alle klienter for validering
+    |   |  └──ca.srl  # Serial Number List - Trackser udstedte serienumre
+    |   |  └──ca.key  # Privat nøgle - Bruges til at underskrive andre certifikater
     ├── ssl/
     |   ├──client
     |   |  └──kamera
-    |   |     └──client.crt
-    |   |     └──client.csr
-    |   |     └──client.key
+    |   |     └──client.crt # Klient-certifikat - Verificerer PC'ens identitet
+    |   |     └──client.csr # CSR for klient - Anmodning om klientcertifikat
+    |   |     └──client.key # Privat klient-nøgle - Til klient-autentifikation mod broker
     |   |  └──rasp
     |   |     └──rasp.crt
     |   |     └──rasp.csr
